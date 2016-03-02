@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Open Solar Tucson</title>
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.14.0/css/ol.css" type="text/css">
+    <script src="http://openlayers.org/en/v3.14.0/build/ol.js"></script>
+  </head>
+  <body>
+    <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    #menu {
+      height: 28px;
+      background-color: #CC0033;
+	  padding: 10px;
+	}
+	#menutitle {
+	  color: #000000;
+	  vertical-align: middle;
+	  float: left;
+	}
+	#menusearch {
+	  height: 28px;
+	  vertical-align: middle;
+	  float: left;
+	}
+    </style>
+    <div id="menu">
+		<div id="menutitle"><h2>OpenSolar</h2></div>
+		<div id="menusearch"><input type="text" id="address-search" onSubmit="runSearch()"></div>
+		<div id="menubutton"><input value="Search" type="button" onClick="runSearch()"></div>
+	</div>
+    <div id="map" class="map"></div>
+    <script>
+      var layers = [
+        new ol.layer.Group({
+          style: 'AerialWithLabels',
+          visible: true,
+          layers: [
+            new ol.layer.Tile({
+              source: new ol.source.MapQuest({layer: 'sat'})
+            }),
+            new ol.layer.Tile({
+              source: new ol.source.MapQuest({layer: 'hyb'})
+            })
+          ]
+        })
+      ];
+
+      var map = new ol.Map({
+        layers: layers,
+        target: 'map',
+        view: new ol.View({
+          center: ol.proj.transform(
+              [-110.9499, 32.23165], 'EPSG:4326', 'EPSG:3857'),
+          zoom: 15
+        })
+      });
+	  
+	  function runSearch() {
+	    var xmlhttp = new XMLHttpRequest();
+		var url = "http://nominatim.openstreetmap.org/search?format=json&q=" + document.getElementById('address-search').value.split(' ').join('+')
+		xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				var myArr = JSON.parse(xmlhttp.responseText);
+				moveToAddress(myArr);
+			}
+		};
+		xmlhttp.open("GET", url, true);
+		xmlhttp.send();
+	  }
+	  
+	  function moveToAddress(arr) {
+		
+		map.getView().setCenter(ol.proj.transform([Number(arr[0].lon), Number(arr[0].lat)], 'EPSG:4326', 'EPSG:3857'));
+
+		map.getView().setZoom(19);
+	  }
+    </script>
+  </body>
+</html>
