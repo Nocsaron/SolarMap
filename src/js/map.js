@@ -1,6 +1,6 @@
 // Load Aerial with Labels layer from bing maps
 var layers = [];
-layers.push(new ol.layer.Tile({
+var bing = new ol.layer.Tile({
   visible: true,
   preload: Infinity,
   source: new ol.source.BingMaps({
@@ -8,7 +8,9 @@ layers.push(new ol.layer.Tile({
     imagerySet: 'AerialWithLabels',
     maxZoom: 19
   })
-}));
+});
+layers.push(bing);
+
 var overlay = new ol.layer.Tile({
   visible: true,
   source: new ol.source.XYZ({
@@ -17,6 +19,28 @@ var overlay = new ol.layer.Tile({
 });
 overlay.setOpacity(1);
 layers.push(overlay); 
+
+var source = new ol.source.Vector({wrapX: false});
+
+var vector = new ol.layer.Vector({
+  source: source,
+  style: new ol.style.Style({
+    fill: new ol.style.Fill({
+      color: 'rgba(255, 255, 255, 0.2)'
+    }),
+    stroke: new ol.style.Stroke({
+      color: '#ffcc33',
+      width: 2
+    }),
+    image: new ol.style.Circle({
+      radius: 6,
+      fill: new ol.style.Fill({
+        color: '#ffcc33'
+      })
+    })
+  })
+});
+layers.push(vector);
 
 // build map, center on Tucson
 var map = new ol.Map({
@@ -28,37 +52,6 @@ var map = new ol.Map({
   	  [-110.9499, 32.23165], 'EPSG:4326', 'EPSG:3857'),
     resolution: 13
   })
-});
-
-
-
-// a normal select interaction to handle click
-var select = new ol.interaction.Select();
-map.addInteraction(select);
-
-var selectedFeatures = select.getFeatures();
-
-// a DragBox interaction used to select features by drawing boxes
-var dragBox = new ol.interaction.DragBox({
-  condition: ol.events.condition.platformModifierKeyOnly
-});
-
-map.addInteraction(dragBox);
-dragBox.on('boxend', function() {
-  // features that intersect the box are added to the collection of
-  // selected features, and their names are displayed in the "info"
-  // div
-  var info = [];
-  var extent = dragBox.getGeometry().getExtent();
-  console.log(extent);
-});
-
-// clear selection when drawing a new box and when clicking on the map
-dragBox.on('boxstart', function() {
-  selectedFeatures.clear();
-});
-map.on('click', function() {
-  selectedFeatures.clear();
 });
 
 // Called when search is run, uses geo location on address to get lat/lon
@@ -94,3 +87,50 @@ function moveToAddress(arr) {
   map.getView().setCenter(ol.proj.fromLonLat([Number(arr[0].lon), Number(arr[0].lat)]));
   map.getView().setResolution(0.25);
 }
+
+var typeSelect = document.getElementById('type');
+
+var draw; // global so we can remove it later
+function addInteraction() {
+  var value = typeSelect.value;
+  if (value !== 'None') {
+    var geometryFunction, maxPoints;
+    if (value === 'Box') {
+      value = 'LineString';
+      maxPoints = 2;
+      geometryFunction = function(coordinates, geometry) {
+        if (!geometry) {
+          geometry = new ol.geom.Polygon(null);
+        }
+        var start = coordinates[0];
+        var end = coordinates[1];
+        geometry.setCoordinates([
+          [start, [start[0], end[1]], end, [end[0], start[1]], start]
+        ]);
+
+        var start_point = ol.proj.transform(start, 'EPSG:3857', 'EPSG:4326');
+        var end_point = ol.proj.transform(end, 'EPSG:3857', 'EPSG:4326');
+
+        return geometry;
+      };
+    }
+    draw = new ol.interaction.Draw({
+      source: source,
+      type: /** @type {ol.geom.GeometryType} */ (value),
+      geometryFunction: geometryFunction,
+      maxPoints: maxPoints
+    });
+    map.addInteraction(draw);
+  }
+}
+
+
+/**
+ * Handle change event.
+ */
+typeSelect.onchange = function() {
+  map.removeInteraction(draw);
+  addInteraction();
+};
+
+addInteraction();

@@ -2,22 +2,48 @@
 <html>
   <head>
     <title>Solar Tucson</title>
-    <link rel="stylesheet" href="http://openlayers.org/en/v3.14.0/css/ol.css" type="text/css">
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/ol.css" type="text/css">
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="css/main.css" type="text/css">
     <script src="js/ol.js"></script>
   </head>
   <body>
-  <nav class="navbar navbar-default navbar-fixed-top" style="position:relative;margin-bottom:-0.5%"> 
-	  <div class="container">
-		<form class="form-inline" action="javascript: runSearch()">
-			<div class="form-group">
-				 <label><h4>Solar Tucson</h4></label>
-				<input type="text" class="form-control" id="address-search" placeholder="1401 E University Blvd, Tucson, AZ 85721">
-			</div>
-		</form>
-	  </div>
-	</nav>
-    <div id="map" class="map"></div>
-	<script src="js/map.js"></script>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            <a class="navbar-brand" href="#">Solar Tucson</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <form class="navbar-form navbar-left" action="javascript: runSearch()">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="address-search" placeholder="1401 E University Blvd, Tucson, AZ 85721">
+                    </div>
+                </form>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active"><a href="#">Map</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Code</a></li>
+                    <li><a href="#documentation">Documentation</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div id="map" class="map container"></div>
+    <div class="container">
+        <form class="form-inline">
+            <label>Solar Zone Thing &nbsp;</label>
+            <select id="type">
+                <option value="None">None</option>
+                <option value="Box">Box</option>
+            </select>
+        </form>
+    </div>
+    <script src="js/map.js"></script>
   </body>
 </html>
