@@ -6,3 +6,12 @@ body {
 #address-search {
     width: 300px;
 }
+
+.toggle-selection {
+    top: 100px;
+    left: .5em;
+}
+
+.ol-touch .toggle-selection {
+    top: 80px;
+}

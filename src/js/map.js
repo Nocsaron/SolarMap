@@ -1,3 +1,45 @@
+window.app = {};
+var app = window.app;
+
+
+//
+// Define rotate to north control.
+//
+
+
+/**
+ * @constructor
+ * @extends {ol.control.Control}
+ * @param {Object=} opt_options Control options.
+ */
+app.SelectionToggle = function(opt_options) {
+
+  var options = opt_options || {};
+
+  var button = document.createElement('button');
+  button.innerHTML = 'S';
+
+  var this_ = this;
+  var toggleSelectionMode = function() {
+    // toggle selection mode
+    flipToggle();
+  };
+
+  button.addEventListener('click', toggleSelectionMode, false);
+  button.addEventListener('touchstart', toggleSelectionMode, false);
+
+  var element = document.createElement('div');
+  element.className = 'toggle-selection ol-unselectable ol-control';
+  element.appendChild(button);
+
+  ol.control.Control.call(this, {
+    element: element,
+    target: options.target
+  });
+
+};
+ol.inherits(app.SelectionToggle, ol.control.Control);
+
 // Load Aerial with Labels layer from bing maps
 var layers = [];
 var bing = new ol.layer.Tile({
@@ -44,6 +86,13 @@ layers.push(vector);
 
 // build map, center on Tucson
 var map = new ol.Map({
+  controls: ol.control.defaults({
+    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+      collapsible: false
+    })
+  }).extend([
+    new app.SelectionToggle()
+  ]),
   layers: layers,
   target: 'map',
   loadTilesWhileInteracting: true,
@@ -91,29 +140,31 @@ function moveToAddress(arr) {
 var typeSelect = document.getElementById('type');
 
 var draw; // global so we can remove it later
+var i_toggle = false;
 function addInteraction() {
-  var value = typeSelect.value;
-  if (value !== 'None') {
+  if (i_toggle) {
     var geometryFunction, maxPoints;
-    if (value === 'Box') {
-      value = 'LineString';
-      maxPoints = 2;
-      geometryFunction = function(coordinates, geometry) {
-        if (!geometry) {
-          geometry = new ol.geom.Polygon(null);
-        }
-        var start = coordinates[0];
-        var end = coordinates[1];
-        geometry.setCoordinates([
-          [start, [start[0], end[1]], end, [end[0], start[1]], start]
-        ]);
+    var value = 'LineString';
+    maxPoints = 2;
+    geometryFunction = function(coordinates, geometry) {
+      if (!geometry) {
+        geometry = new ol.geom.Polygon(null);
+      }
+      var start = coordinates[0];
+      var end = coordinates[1];
+      geometry.setCoordinates([
+        [start, [start[0], end[1]], end, [end[0], start[1]], start]
+      ]);
 
+      if (coordinates.length > 2) {
         var start_point = ol.proj.transform(start, 'EPSG:3857', 'EPSG:4326');
         var end_point = ol.proj.transform(end, 'EPSG:3857', 'EPSG:4326');
+        console.log('mouse click coord : ' + start_point + ' | ' + end_point);
+      }
 
-        return geometry;
-      };
-    }
+      return geometry;
+    };
+
     draw = new ol.interaction.Draw({
       source: source,
       type: /** @type {ol.geom.GeometryType} */ (value),
@@ -124,13 +175,15 @@ function addInteraction() {
   }
 }
 
+function flipToggle() {
+  if (i_toggle) {
+    i_toggle = false;
+  } else {
+    i_toggle = true;
+  }
 
-/**
- * Handle change event.
- */
-typeSelect.onchange = function() {
   map.removeInteraction(draw);
   addInteraction();
-};
+}
 
 addInteraction();
