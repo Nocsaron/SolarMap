@@ -53,14 +53,36 @@ var bing = new ol.layer.Tile({
 });
 layers.push(bing);
 
+// Tile # information
 var overlay = new ol.layer.Tile({
   visible: true,
   source: new ol.source.XYZ({
     url: 'http://cs.arizona.edu/people/woodti/tiles/{z}/{x}/{y}.png'
   })
 });
-overlay.setOpacity(1);
+overlay.setOpacity(0);
 layers.push(overlay); 
+
+// Nick's tiles
+var overlay2 = new ol.layer.Tile({
+  visible: true,
+  source: new ol.source.XYZ({
+    url: 'http://cs.arizona.edu/people/woodti/tiles2/{z}/{x}/{y}.png'
+  })
+});
+overlay2.setOpacity(0.5);
+layers.push(overlay2); 
+
+
+// Demo tile
+var overlay3 = new ol.layer.Tile({
+  visible: true,
+  source: new ol.source.XYZ({
+    url: 'http://cs.arizona.edu/people/woodti/tiles3/{z}/{x}/{y}.png'
+  })
+});
+overlay3.setOpacity(0.85);
+layers.push(overlay3); 
 
 var source = new ol.source.Vector({wrapX: false});
 
@@ -71,7 +93,7 @@ var vector = new ol.layer.Vector({
       color: 'rgba(255, 255, 255, 0.2)'
     }),
     stroke: new ol.style.Stroke({
-      color: '#ffcc33',
+      color: '#0000ff',
       width: 2
     }),
     image: new ol.style.Circle({
@@ -99,7 +121,8 @@ var map = new ol.Map({
   view: new ol.View({
     center: ol.proj.transform(
   	  [-110.9499, 32.23165], 'EPSG:4326', 'EPSG:3857'),
-    resolution: 13
+    resolution: 13,
+    projection: 'EPSG:900913'
   })
 });
 
