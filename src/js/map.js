@@ -56,12 +56,11 @@ var solarLayer = new ol.layer.Tile({
       var z = coord[0];
       var x = coord[1];
       var y = Math.pow(2, z) + coord[2];
-      console.log(coord);
       return 'http://www.cs.arizona.edu/people/woodti/solar_tiles/' + z + '/' + x + '/' + y + '.png';
     }
   })
 });
-solarLayer.setOpacity(0.4);
+solarLayer.setOpacity(0.5);
 layers.push(solarLayer);
 
 // Drag layer
@@ -100,8 +99,8 @@ var map = new ol.Map({
   loadTilesWhileInteracting: true,
   view: new ol.View({
     center: ol.proj.transform(
-  	  [-110.9499, 32.23165], 'EPSG:4326', 'EPSG:3857'),
-    resolution: 13
+  	  [-110.9499, 32.2285], 'EPSG:4326', 'EPSG:3857'),
+    zoom: 15
   })
 });
 
