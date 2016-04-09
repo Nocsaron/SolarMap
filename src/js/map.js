@@ -1,19 +1,15 @@
 window.app = {};
 var app = window.app;
 
+/* Currently unused, but could be useful
+function tile2long(x,z) { return (x/Math.pow(2,z)*360-180); }
 
-//
-// Define rotate to north control.
-//
+function tile2lat(y,z) {
+    var n=Math.PI-2*Math.PI*y/Math.pow(2,z);
+    return (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
+}*/
 
-
-/**
- * @constructor
- * @extends {ol.control.Control}
- * @param {Object=} opt_options Control options.
- */
 app.SelectionToggle = function(opt_options) {
-
   var options = opt_options || {};
 
   var button = document.createElement('button');
@@ -53,17 +49,23 @@ var bing = new ol.layer.Tile({
 });
 layers.push(bing);
 
-var overlay = new ol.layer.Tile({
+var solarLayer = new ol.layer.Tile({
   visible: true,
-  source: new ol.source.XYZ({
-    url: 'http://cs.arizona.edu/people/woodti/tiles/{z}/{x}/{y}.png'
+  source: new ol.source.TileImage({
+    tileUrlFunction: function(coord) {
+      var z = coord[0];
+      var x = coord[1];
+      var y = Math.pow(2, z) + coord[2];
+      console.log(coord);
+      return 'http://www.cs.arizona.edu/people/woodti/solar_tiles/' + z + '/' + x + '/' + y + '.png';
+    }
   })
 });
-overlay.setOpacity(1);
-layers.push(overlay); 
+solarLayer.setOpacity(0.4);
+layers.push(solarLayer);
 
+// Drag layer
 var source = new ol.source.Vector({wrapX: false});
-
 var vector = new ol.layer.Vector({
   source: source,
   style: new ol.style.Style({
