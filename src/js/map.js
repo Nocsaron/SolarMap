@@ -49,6 +49,7 @@ var bing = new ol.layer.Tile({
 });
 layers.push(bing);
 
+// Solar tiles
 var solarLayer = new ol.layer.Tile({
   visible: true,
   source: new ol.source.TileImage({
@@ -60,6 +61,7 @@ var solarLayer = new ol.layer.Tile({
     }
   })
 });
+
 solarLayer.setOpacity(0.5);
 layers.push(solarLayer);
 
@@ -72,7 +74,7 @@ var vector = new ol.layer.Vector({
       color: 'rgba(255, 255, 255, 0.2)'
     }),
     stroke: new ol.style.Stroke({
-      color: '#ffcc33',
+      color: '#0000ff',
       width: 2
     }),
     image: new ol.style.Circle({
