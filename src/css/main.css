@@ -12,6 +12,11 @@ body {
     left: .5em;
 }
 
+.clear {
+	top: 130px;
+	left: .5em;
+}
+
 .ol-touch .toggle-selection {
     top: 80px;
 }
